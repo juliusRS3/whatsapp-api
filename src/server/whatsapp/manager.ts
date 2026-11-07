@@ -23,7 +23,11 @@ class SessionManager {
 
   private isBrowserLockError(error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    return message.includes("The browser is already running for");
+    return (
+      message.includes("The browser is already running for") ||
+      message.includes("profile appears to be in use") ||
+      message.includes("process_singleton")
+    );
   }
 
   private normalizeInitError(error: unknown) {
@@ -51,10 +55,10 @@ class SessionManager {
         path.join(sessionDir, "SingletonSocket"),
       ];
 
+      // SingletonLock is a symlink to the old container's host name. existsSync() is false for a
+      // dangling symlink, so remove unconditionally (force ignores missing files).
       for (const filePath of lockCandidates) {
-        if (fs.existsSync(filePath)) {
-          fs.rmSync(filePath, { force: true });
-        }
+        fs.rmSync(filePath, { force: true });
       }
     } catch {
       // ignore stale lock cleanup errors

@@ -46,8 +46,25 @@ export function pairingPhoneNumber() {
   return digits.length >= 8 ? digits : null;
 }
 
+/**
+ * After a redeploy the volume still holds Chromium's lock files from the previous container,
+ * and Chromium then refuses to start ("profile appears to be in use by another computer").
+ * Only one container uses this volume, so a lock left behind is always stale.
+ */
+function removeStaleBrowserLocks(dataDir: string, sessionId: string) {
+  const sessionDir = path.join(dataDir, `session-${sessionId}`);
+  for (const name of ["SingletonLock", "SingletonCookie", "SingletonSocket"]) {
+    try {
+      fs.rmSync(path.join(sessionDir, name), { force: true });
+    } catch {
+      // ignore
+    }
+  }
+}
+
 export function createWwebjsClient(sessionId: string) {
   const resolvedDir = resolveDataPath();
+  removeStaleBrowserLocks(resolvedDir, sessionId);
   const pairingPhone = pairingPhoneNumber();
 
   return new Client({
