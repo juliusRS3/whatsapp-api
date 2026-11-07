@@ -130,6 +130,14 @@ class SessionManager {
       });
     });
 
+    // Pairing code (when PAIRING_PHONE_NUMBER is set): a new 8-character code about every 3 minutes
+    client.on("code", (code: string) => {
+      statusStore.upsertSession(sessionId, {
+        status: "pairing",
+        pairingCode: code,
+      });
+    });
+
     client.on("authenticated", () => {
       context.isInitialized = true;
       context.reconnectAttempts = 0;
@@ -291,6 +299,10 @@ class SessionManager {
     return statusStore.getSession(sessionId)?.qr || null;
   }
 
+  getPairingCode(sessionId: string) {
+    return statusStore.getSession(sessionId)?.pairingCode || null;
+  }
+
   async reconnect(sessionId: string) {
     const context = this.getOrCreateContext(sessionId);
     statusStore.upsertSession(sessionId, {
@@ -349,6 +361,7 @@ class SessionManager {
     statusStore.upsertSession(sessionId, {
       status: "disconnected",
       qr: undefined,
+      pairingCode: undefined,
       reconnectAttempts: 0,
       lastError: undefined,
     });

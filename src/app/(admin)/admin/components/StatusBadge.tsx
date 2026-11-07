@@ -3,6 +3,7 @@ import type { SessionStatus } from "@/server/store/statusStore";
 const statusStyles: Record<SessionStatus, string> = {
   connecting: "bg-amber-100 text-amber-700",
   qr: "bg-blue-100 text-blue-700",
+  pairing: "bg-blue-100 text-blue-700",
   authenticated: "bg-cyan-100 text-cyan-700",
   ready: "bg-emerald-100 text-emerald-700",
   disconnected: "bg-zinc-200 text-zinc-700",

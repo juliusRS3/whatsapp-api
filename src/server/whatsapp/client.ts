@@ -36,10 +36,24 @@ export function resolveDataPath() {
   );
 }
 
+/**
+ * Phone number to link by typed pairing code instead of a QR code, digits with country code
+ * (e.g. 60123456789). Set PAIRING_PHONE_NUMBER on the server. The 8-character code then appears
+ * on the admin page; on the phone: Linked devices > Link a device > Link with phone number instead.
+ */
+export function pairingPhoneNumber() {
+  const digits = (process.env.PAIRING_PHONE_NUMBER || "").replace(/\D/g, "");
+  return digits.length >= 8 ? digits : null;
+}
+
 export function createWwebjsClient(sessionId: string) {
   const resolvedDir = resolveDataPath();
+  const pairingPhone = pairingPhoneNumber();
 
   return new Client({
+    ...(pairingPhone
+      ? { pairWithPhoneNumber: { phoneNumber: pairingPhone, showNotification: true, intervalMs: 180000 } }
+      : {}),
     authStrategy: new LocalAuth({
       clientId: sessionId,
       dataPath: resolvedDir,

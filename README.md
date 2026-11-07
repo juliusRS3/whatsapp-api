@@ -205,3 +205,10 @@ Error:
   }
 }
 ```
+
+## Link with a pairing code instead of a QR (juliusRS3 fork)
+
+Set `PAIRING_PHONE_NUMBER` on the server to the WhatsApp number to link, digits with country code
+(e.g. `60133127010`), and redeploy. The admin page then shows an 8-character code instead of a QR
+(a new one about every 3 minutes). On the phone: WhatsApp > Linked devices > Link a device >
+**Link with phone number instead**, and type the code. Remove the variable to go back to QR codes.

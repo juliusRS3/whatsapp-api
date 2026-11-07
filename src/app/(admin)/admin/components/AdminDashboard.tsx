@@ -59,6 +59,7 @@ export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>("send");
   const [selectedSessionId, setSelectedSessionId] = useState<string>("main");
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [screenshotDataUrl, setScreenshotDataUrl] = useState<string | null>(null);
   const [capturingScreenshot, setCapturingScreenshot] = useState(false);
@@ -104,15 +105,18 @@ export function AdminDashboard() {
       const response = await fetch(`/api/admin/qr?sessionId=${encodeURIComponent(sessionId)}`, {
         cache: "no-store",
       });
-      const payload = await readJsonSafely<{ qrDataUrl: string | null }>(response);
+      const payload = await readJsonSafely<{ qrDataUrl: string | null; pairingCode?: string | null }>(response);
       if (!response.ok || !payload?.ok) {
         setQrDataUrl(null);
+        setPairingCode(null);
         return;
       }
 
       setQrDataUrl(payload.data.qrDataUrl);
+      setPairingCode(payload.data.pairingCode ?? null);
     } catch {
       setQrDataUrl(null);
+      setPairingCode(null);
     }
   }, []);
 
@@ -336,8 +340,8 @@ export function AdminDashboard() {
         </div>
 
         <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/80 p-5 lg:col-span-4">
-          <h2 className="mb-3 font-medium">QR</h2>
-          <QrViewer qrDataUrl={qrDataUrl} />
+          <h2 className="mb-3 font-medium">{pairingCode ? "Link with code" : "QR"}</h2>
+          <QrViewer qrDataUrl={qrDataUrl} pairingCode={pairingCode} />
         </div>
       </section>
 

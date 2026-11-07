@@ -1,6 +1,7 @@
 export type SessionStatus =
   | "connecting"
   | "qr"
+  | "pairing"
   | "authenticated"
   | "ready"
   | "disconnected"
@@ -11,6 +12,7 @@ export interface SessionState {
   sessionId: string;
   status: SessionStatus;
   qr?: string;
+  pairingCode?: string;
   lastError?: string;
   reconnectAttempts: number;
   updatedAt: string;
@@ -40,6 +42,7 @@ class StatusStore {
       sessionId,
       status: patch.status ?? previous?.status ?? "unknown",
       qr: patch.qr ?? previous?.qr,
+      pairingCode: patch.pairingCode ?? previous?.pairingCode,
       lastError: patch.lastError ?? previous?.lastError,
       reconnectAttempts:
         patch.reconnectAttempts ?? previous?.reconnectAttempts ?? 0,
@@ -48,6 +51,7 @@ class StatusStore {
 
     if (patch.status === "ready" || patch.status === "authenticated") {
       nextState.qr = undefined;
+      nextState.pairingCode = undefined;
       nextState.lastError = undefined;
     }
 

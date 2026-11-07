@@ -12,6 +12,12 @@ export async function GET(request: NextRequest) {
   // Start session without blocking — QR arrives via event
   sessionManager.startSession(sessionId);
 
+  const pairingCode = sessionManager.getPairingCode(sessionId);
+  const state0 = sessionManager.getSessionState(sessionId);
+  if (pairingCode && state0.status !== "ready" && state0.status !== "authenticated") {
+    return ok({ sessionId, qrDataUrl: null, pairingCode });
+  }
+
   const qr = sessionManager.getQrString(sessionId);
   if (!qr) {
     const state = sessionManager.getSessionState(sessionId);

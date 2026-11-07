@@ -68,6 +68,7 @@ export const openApiDocument = {
             enum: [
               "connecting",
               "qr",
+              "pairing",
               "authenticated",
               "ready",
               "disconnected",
